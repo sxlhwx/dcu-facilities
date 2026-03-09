@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>DCU 교내 시설 운영시간</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body onload="init()">
+
+<div id="top-notice-bar" class="notice-bar" onclick="openNoticeModal()" style="display:none;">
+  <span>📢</span><span id="notice-bar-title">공지사항</span>
+</div>
+
+<div id="overlay" onclick="closeSidebar(); closeNoticeModal();"></div>
+<div id="img-overlay" onclick="closeImage()">
+  <img id="img-expanded">
+</div>
+
+<div id="notice-modal" class="notice-modal">
+  <div class="notice-modal-header">
+    <span style="font-weight:700;">📢 공지사항</span>
+  </div>
+  <div id="notice-modal-content" class="notice-modal-content"></div>
+</div>
+
+<div id="sidebar"><div id="sb-body"></div></div>
+
+<div class="topbar">
+  <div class="topbar-title">DCU <span style="font-weight:400;color:#aaa;">|</span> <span style="font-weight:400">FACILITIES</span></div>
+  <div class="topbar-clock" id="clock"></div>
+</div>
+
+<div class="subbar">
+  <input id="search-input" type="text" placeholder="시설명 또는 구역(A, B1) 검색" oninput="handleSearch(this.value)" style="border:none;outline:none;font-family:var(--sans);font-size:11px;background:none;flex:1;" />
+  
+  <select id="mobile-cat-select" onchange="handleMobileCat(this.value)">
+    <option value="all">전체</option>
+    <option value="식당">식당</option>
+    <option value="편의점">편의점</option>
+    <option value="카페">카페</option>
+    <option value="학습">학습</option>
+    <option value="복지·문화">복지·문화</option>
+  </select>
+
+  <button class="cat-btn active" onclick="toggleCat('식당',this)">식당</button>
+  <button class="cat-btn active" onclick="toggleCat('편의점',this)">편의점</button>
+  <button class="cat-btn active" onclick="toggleCat('카페',this)">카페</button>
+  <button class="cat-btn active" onclick="toggleCat('학습',this)">학습</button>
+  <button class="cat-btn active" onclick="toggleCat('복지·문화',this)">복지·문화</button>
+</div>
+
+<div class="main-container">
+  <div class="spacer"></div>
+  <div class="fixed-header">
+    <table class="facility-table">
+      <thead>
+        <tr>
+          <th class="col-loc">위치</th>
+          <th class="col-cat">구분</th>
+          <th class="col-name">시설명</th>
+          <th class="col-rem">남은시간</th>
+          <th class="col-time">운영시간</th>
+        </tr>
+      </thead>
+    </table>
+  </div>
+  <div class="scroll-area">
+    <table class="facility-table">
+      <tbody id="view-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="bottombar">
+  <span class="bottombar-notice" id="bottom-notice"></span>
+  <div class="view-toggle-group" style="margin-left:auto; display:flex; align-items:center; gap:8px;">
+    <button class="view-toggle-btn" id="btn-desktop" onclick="toggleView('desktop')" style="background:none;border:none;cursor:pointer;font-family:var(--sans);font-size:11px;color:var(--gray-400);">💻 데스크탑</button>
+    <span class="view-toggle-sep" style="color:var(--gray-200);font-size:10px;">|</span>
+    <button class="view-toggle-btn" id="btn-mobile" onclick="toggleView('mobile')" style="background:none;border:none;cursor:pointer;font-family:var(--sans);font-size:11px;color:var(--gray-400);">📱 모바일</button>
+    
+    <button class="view-toggle-btn-mini" id="btn-mini" onclick="toggleView(currentView === 'desktop' ? 'mobile' : 'desktop')" style="display:none; background:none;border:none;cursor:pointer;font-size:16px;">💻</button>
+  </div>
+</div>
+
+<script src="notice.js"></script>
+<script src="data.js"></script>
+<script src="photo.js"></script>
+<script src="time.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>
