@@ -17,7 +17,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--black); 
 
 /* 모달 제목 영역: 글자가 길어질 경우 자연스럽게 줄바꿈되도록 속성 추가 */
 .notice-modal-header { padding: 16px 20px; border-bottom: 1px solid var(--gray-200); font-size: 15px; line-height: 1.4; word-break: keep-all; overflow-wrap: break-word; }
-.notice-modal-content { padding: 20px; font-size: 14px; line-height: 1.6; color: var(--gray-600); max-height: 60vh; overflow-y: auto; }
+.notice-modal-content { padding: 20px; font-size: 14px; line-height: 1.6; color: var(--gray-600); max-height: 60vh; overflow-y: auto; word-break: keep-all; text-align: justify; }
 
 /* 공통 바 디자인 */
 .topbar { border-bottom: 1.5px solid var(--black); display: flex; align-items: stretch; justify-content: space-between; padding: 0 24px; height: 48px; flex-shrink: 0; }

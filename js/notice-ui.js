@@ -11,10 +11,10 @@ function initNotice() {
     title.innerHTML = `<span style="font-weight:700;">${NOTICE_DATA.title}</span>` + 
                       (NOTICE_DATA.subtitle ? ` <span style="font-weight:400; margin-left:6px; color:#fecaca;">${NOTICE_DATA.subtitle}</span>` : '');
     
-    // 모달 창 제목 + 부제 적용 (index.html 수정 없이 DOM으로 덮어쓰기)
+    // 모달 창 제목 + 부제 줄바꿈 적용
     if (modalHeader) {
-      modalHeader.innerHTML = `<span style="font-weight:700;">📢 ${NOTICE_DATA.title}</span>` + 
-                              (NOTICE_DATA.subtitle ? ` <span style="font-weight:400; margin-left:6px; color:var(--gray-600);">${NOTICE_DATA.subtitle}</span>` : '');
+      modalHeader.innerHTML = `<div style="font-weight:700;">📢 ${NOTICE_DATA.title}</div>` + 
+                              (NOTICE_DATA.subtitle ? `<div style="font-weight:400; font-size:13px; color:var(--gray-600); margin-top:6px;">${NOTICE_DATA.subtitle}</div>` : '');
     }
 
     content.innerHTML = NOTICE_DATA.content;
