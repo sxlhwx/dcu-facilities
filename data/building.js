@@ -1,0 +1,22 @@
+const BUILDINGS = {
+  "A1": { name: "본관", alias: "Administration" }, "A2": { name: "교양관", alias: "St. Thomas" }, "A3": { name: "종합민원센터", alias: "Service Center" },
+  "A4": { name: "팔각정", alias: "Pavilion" }, "A6": { name: "제1학생회관", alias: "Student Union 1" }, "A7": { name: "제2학생회관", alias: "Cafeteria 1" },
+  "A8": { name: "중앙도서관", alias: "Library" }, "A9": { name: "종합강의동", alias: "John Sye Hall" }, "A10": { name: "사육장", alias: "Animal House" },
+  "A11": { name: "제2식당", alias: "Cafeteria 2" }, "A13": { name: "영선실", alias: "Carpenter Room" }, "B1": { name: "취창업관", alias: "Employment" },
+  "B2": { name: "제르멩관", alias: "Germain Hall" }, "B3": { name: "성당(교목처)", alias: "Chapel" }, "B4": { name: "국제관", alias: "International Hall" },
+  "B5": { name: "학생군사교육단", alias: "ROTC" }, "B6": { name: "박물관", alias: "Museum" }, "B7": { name: "강당", alias: "Auditorium" },
+  "B8": { name: "산학협력관", alias: "John Choi Hall" }, "C1": { name: "성토마스모어관", alias: "More Hall" }, "C2": { name: "성라이문도관", alias: "Raymund Hall" },
+  "C3": { name: "체육관", alias: "Gymnasium" }, "C4": { name: "성비토관", alias: "Vitus Hall" }, "C5": { name: "사제관", alias: "Rectory" },
+  "C6": { name: "신학관", alias: "Seminary" }, "C7": { name: "성예로니모관", alias: "Jerome Hall" }, "C8": { name: "창고", alias: "Warehouse" },
+  "C9": { name: "성요한보스코관", alias: "Bosco Hall" }, "C10": { name: "제3학생식당", alias: "Cafeteria 3" }, "C11": { name: "미래인재관", alias: "HRD Center" },
+  "C12": { name: "성야고보관", alias: "James Hall" }, "C13": { name: "성마태오관", alias: "Matthew Hall" }, "D1": { name: "창업보육센터", alias: "Incubator" },
+  "D2": { name: "공학관,제2산학협력관", alias: "Matthias Hall" }, "D3": { name: "해양바이오산업연구센터", alias: "Marine Bio" }, "D4": { name: "중앙기기센터", alias: "Research Fac." },
+  "D5": { name: "성도미니코관", alias: "Dominic Hall" }, "D6": { name: "성이시도르관", alias: "Isidore Hall" }, "D7": { name: "제1약학관", alias: "Damiano Hall" },
+  "D8": { name: "정보통신관", alias: "IT Center" }, "D9": { name: "성토마스관", alias: "Thomas Hall" }, "D10": { name: "제2약학관", alias: "Cosmas Hall" },
+  "D11": { name: "성마르타관", alias: "Martha Hall" }, "D12": { name: "미술실습동", alias: "Fine Arts Lab" }, "D15": { name: "성카타리나관", alias: "Catherine Hall" },
+  "D16": { name: "아마레갤러리", alias: "Cafeteria 4" }, "D17": { name: "성체칠리아관", alias: "Cecilia Hall" }, "D18": { name: "성안나관", alias: "Anna Hall" },
+  "E1": { name: "성바오로문화관", alias: "Paul Hall" }, "E3": { name: "기숙사 아마레관", alias: "Amare Hall" }, "E4": { name: "기숙사 행정동", alias: "Dormitory Admin" },
+  "E5": { name: "기숙사 예지관", alias: "Wisdom Hall" }, "E6": { name: "기숙사 세르비레관", alias: "Servire Hall" }, "E7": { name: "기숙사 효성관", alias: "Morning Star Hall" },
+  "E8": { name: "기숙사 성김대건관", alias: "Andrew Hall" }, "E9": { name: "기숙사 다솜관", alias: "Charity Hall" }, "E10": { name: "기숙사 참인재관", alias: "HCC Hall" },
+  "E11": { name: "성이윤일관", alias: "Admissions" }, "E12": { name: "대가빌라1동", alias: "Christopher's House" }, "E13": { name: "대가빌라2동", alias: "Clarion House" }
+};
