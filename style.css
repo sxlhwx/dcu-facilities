@@ -7,10 +7,16 @@
 body { font-family: var(--sans); background: var(--white); color: var(--black); font-size: 14px; line-height: 1.5; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
 
 /* 공지사항 바 및 모달 */
-.notice-bar { background-color: #991b1b; color: var(--white); height: 30px; display: flex; align-items: center; padding: 0 24px; font-family: var(--sans); font-size: 12px; font-weight: 500; gap: 8px; cursor: pointer; flex-shrink: 0; }
+/* 상단 바: min-width: 0 추가하여 말줄임표 작동 환경 구성 */
+.notice-bar { background-color: #991b1b; color: var(--white); height: 30px; display: flex; align-items: center; padding: 0 24px; font-family: var(--sans); font-size: 12px; font-weight: 500; gap: 8px; cursor: pointer; flex-shrink: 0; min-width: 0; }
+/* 상단 바 제목 영역: 말줄임표(...) 적용 */
+#notice-bar-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
+
 .notice-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 400px; background: var(--white); border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1500; opacity: 0; visibility: hidden; transition: 0.2s; display: flex; flex-direction: column; }
 .notice-modal.active { opacity: 1; visibility: visible; }
-.notice-modal-header { padding: 16px 20px; border-bottom: 1px solid var(--gray-200); font-size: 15px; }
+
+/* 모달 제목 영역: 글자가 길어질 경우 자연스럽게 줄바꿈되도록 속성 추가 */
+.notice-modal-header { padding: 16px 20px; border-bottom: 1px solid var(--gray-200); font-size: 15px; line-height: 1.4; word-break: keep-all; overflow-wrap: break-word; }
 .notice-modal-content { padding: 20px; font-size: 14px; line-height: 1.6; color: var(--gray-600); max-height: 60vh; overflow-y: auto; }
 
 /* 공통 바 디자인 */
