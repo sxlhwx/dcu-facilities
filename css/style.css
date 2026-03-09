@@ -95,11 +95,7 @@ body.mobile-view .cat-btn { display: none; }
 body.mobile-view #search-input {
   min-width: 0;
   flex: 1;
-  direction: rtl; 
   text-align: left;
-}
-body.mobile-view #search-input::placeholder {
-  direction: ltr; 
 }
 
 body.mobile-view #mobile-cat-select { 
