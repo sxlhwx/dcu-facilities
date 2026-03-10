@@ -38,9 +38,32 @@ window.handleLogin = () => signInWithEmailAndPassword(auth, adminEmail.value, ad
 window.handleLogout = () => signOut(auth);
 window.openLightbox = (src) => { lightboxImg.src = src; lightbox.style.display = 'flex'; };
 
-// 파일 핸들링
+// 파일 핸들링 (드래그앤드랍 로직 추가)
 if(dropZone) {
     dropZone.onclick = () => fileInput.click();
+    
+    // 화면 바깥에 실수로 드롭했을 때 파일 열리는 것 방지
+    window.addEventListener("dragover", (e) => e.preventDefault(), false);
+    window.addEventListener("drop", (e) => e.preventDefault(), false);
+
+    dropZone.ondragover = (e) => { 
+        e.preventDefault(); 
+        dropZone.classList.add('dragover'); 
+    };
+    dropZone.ondragleave = () => { 
+        dropZone.classList.remove('dragover'); 
+    };
+    dropZone.ondrop = (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            fileInput.files = e.dataTransfer.files; // input에 파일 덮어쓰기
+            handleFile(file); // 미리보기 함수 호출
+        }
+    };
+
     fileInput.onchange = (e) => handleFile(e.target.files[0]);
 }
 
