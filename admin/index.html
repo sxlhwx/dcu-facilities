@@ -1,172 +1,230 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>관리자 - 시설 정보 업데이트</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <style>
-        body { font-family: sans-serif; background-color: #f4f4f4; padding: 20px; }
-        .admin-container { background: white; padding: 30px; border-radius: 12px; max-width: 500px; margin: 40px auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 14px; }
-        input, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; padding: 12px; border: none; border-radius: 6px; background: #007bff; color: white; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
-        button:hover { background: #0056b3; }
-        #uploadSection { display: none; }
-        .preview { max-width: 100%; border-radius: 8px; margin-top: 15px; display: none; border: 1px solid #eee; }
-        .search-highlight { background-color: #e9ecef; border-color: #ced4da; }
-    </style>
-    <script src="../data/building.js"></script>
-    <script src="../data/facility.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리자 - 시설 정보 업데이트</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="../data/building.js"></script>
+<script src="../data/facility.js"></script>
+<style>
+  /* 디자인 스타일 유지 */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --black: #111; --white: #fff; --gray-100: #f5f5f5; --gray-200: #e8e8e8;
+    --gray-400: #aaa; --gray-600: #555; --green: #22c55e;
+    --mono: 'Space Mono', monospace; --sans: 'Noto Sans KR', sans-serif;
+  }
+  body { font-family: var(--sans); background: var(--gray-100); color: var(--black); font-size: 14px; }
+  .topbar { position: sticky; top: 0; z-index: 100; background: var(--white); border-bottom: 1.5px solid var(--black); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 48px; }
+  .topbar-title { font-family: var(--mono); font-size: 13px; letter-spacing: 0.12em; font-weight: 700; }
+  .admin-wrap { max-width: 480px; margin: 48px auto; padding: 0 16px 80px; }
+  .card { background: var(--white); border: 1.5px solid var(--black); padding: 32px; }
+  .card-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 20px; }
+  .form-group { margin-bottom: 18px; }
+  label { display: block; font-size: 11px; font-weight: 500; color: var(--gray-600); margin-bottom: 6px; letter-spacing: 0.04em; text-transform: uppercase; }
+  input[type=text], input[type=email], input[type=password], input[type=date], input[type=url], textarea {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--gray-200); background: var(--gray-100);
+    font-family: var(--sans); font-size: 13px; color: var(--black); outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  input:focus, textarea:focus { border-color: var(--black); background: var(--white); }
+  textarea { height: 80px; resize: vertical; }
+  .btn { width: 100%; padding: 12px; border: 1.5px solid var(--black); background: var(--black); color: var(--white); font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: background 0.2s, color 0.2s; }
+  .btn:hover { background: var(--white); color: var(--black); }
+  .btn:disabled { background: var(--gray-400); cursor: not-allowed; border-color: var(--gray-400); }
+  .img-preview { max-width: 100%; border: 1px solid var(--gray-200); margin-top: 10px; display: none; }
+  .file-label { display: block; padding: 10px 12px; border: 1px dashed var(--gray-400); background: var(--gray-100); font-size: 12px; color: var(--gray-600); cursor: pointer; text-align: center; }
+  input[type=file] { display: none; }
+  .btn-logout { font-family: var(--mono); font-size: 10px; border: 1px solid var(--gray-200); background: none; color: var(--gray-600); padding: 4px 12px; cursor: pointer; display: none; }
+  .autocomplete-wrap { position: relative; }
+  .ac-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: var(--white); border: 1.5px solid var(--black); border-top: none; z-index: 200; max-height: 224px; overflow-y: auto; display: none; }
+  .ac-dropdown.open { display: block; }
+  .ac-item { padding: 9px 12px; cursor: pointer; font-size: 13px; display: flex; align-items: baseline; gap: 8px; border-bottom: 1px solid var(--gray-200); }
+  .ac-code { font-family: var(--mono); font-size: 10px; color: var(--gray-400); min-width: 28px; }
+  .ac-name { color: var(--black); flex: 1; }
+  .ac-building { font-size: 11px; color: var(--gray-400); }
+  .focused { background: var(--gray-100); }
+</style>
 </head>
 <body>
-<div class="admin-container">
-    <div id="loginSection">
-        <h2>관리자 로그인</h2>
-        <input type="email" id="adminEmail" placeholder="관리자 이메일" style="margin-bottom:10px;">
+
+<div class="topbar">
+  <div class="topbar-title">DCU <span style="font-weight:400;color:#aaa"> | </span> <span style="font-weight:400">ADMIN</span></div>
+  <button class="btn-logout" id="logoutBtn" onclick="handleLogout()">LOG OUT</button>
+</div>
+
+<div class="admin-wrap">
+  <div id="loginSection">
+    <div class="card">
+      <div class="card-title">Administrator Login</div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="adminEmail" placeholder="관리자 이메일">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
         <input type="password" id="adminPw" placeholder="비밀번호">
-        <button onclick="handleLogin()" style="margin-top:10px;">로그인</button>
+      </div>
+      <button class="btn" onclick="handleLogin()">LOG IN</button>
     </div>
+  </div>
 
-    <div id="uploadSection">
-        <h3>시설 정보 업데이트</h3>
-        
-        <div class="form-group">
-            <label>🔍 시설명/건물명 검색 (자동 완성)</label>
-            <input list="facility-list" id="facilitySearch" class="search-highlight" placeholder="한글 시설명이나 건물명을 입력하세요">
-            <datalist id="facility-list"></datalist>
+  <div id="uploadSection" style="display:none">
+    <div class="card">
+      <div class="card-title">시설 정보 업데이트</div>
+      <div class="form-group">
+        <label>시설명 / 건물명 검색</label>
+        <div class="autocomplete-wrap">
+          <input type="text" id="facilitySearch" placeholder="시설명 또는 건물명 입력" autocomplete="off">
+          <div class="ac-dropdown" id="acDropdown"></div>
         </div>
-
-        <div class="form-group">
-            <label>시설 고유 ID (자동 입력됨)</label>
-            <input type="text" id="facilityId" placeholder="고유 ID (직접 입력도 가능)">
-        </div>
-        <div class="form-group">
-            <label>확인 날짜</label>
-            <input type="date" id="uploadDate">
-        </div>
-        <div class="form-group">
-            <label>정보 출처 링크</label>
-            <input type="url" id="sourceLink" placeholder="https://...">
-        </div>
-        <div class="form-group">
-            <label>메모 (선택 사항)</label>
-            <textarea id="memoText" style="height:80px;" placeholder="추가 설명을 적어주세요"></textarea>
-        </div>
-        <div class="form-group">
-            <label>현장 사진</label>
-            <input type="file" id="imageFile" accept="image/*" onchange="previewImage(this)">
-            <img id="imgPreview" class="preview">
-        </div>
-        <button id="uploadBtn" onclick="handleUpload()">데이터 저장하기</button>
-        <button onclick="handleLogout()" style="margin-top:10px; background:#6c757d;">로그아웃</button>
+      </div>
+      <div class="form-group">
+        <label>시설 고유 ID</label>
+        <input type="text" id="facilityId" placeholder="검색 시 자동 입력" readonly>
+      </div>
+      <div class="form-group">
+        <label>확인 날짜</label>
+        <input type="date" id="uploadDate">
+      </div>
+      <div class="form-group" style="display:flex; align-items:center; gap:10px;">
+        <input type="checkbox" id="isVerified" style="width:auto;">
+        <label style="margin:0;">✅ 검증된 시설로 표시 (사용자 신뢰 마크)</label>
+      </div>
+      <div class="form-group">
+        <label>정보 출처 링크</label>
+        <input type="url" id="sourceLink" placeholder="https://...">
+      </div>
+      <div class="form-group">
+        <label>출처 이미지</label>
+        <label class="file-label" for="imageFile">+ 이미지 첨부 (클릭하여 업로드)</label>
+        <input type="file" id="imageFile" accept="image/*" onchange="previewImg(this)">
+        <img id="imgPreview" class="img-preview">
+      </div>
+      <div class="form-group">
+        <label>메모 (선택)</label>
+        <textarea id="memoText" placeholder="추가 설명을 적어주세요"></textarea>
+      </div>
+      <button class="btn" id="uploadBtn" onclick="handleUpload()">데이터 저장하기</button>
     </div>
+  </div>
 </div>
 
 <script>
-    // 시설 검색 및 자동완성 스크립트
-    window.addEventListener('DOMContentLoaded', () => {
-        const searchInput = document.getElementById('facilitySearch');
-        const dataList = document.getElementById('facility-list');
-        const idInput = document.getElementById('facilityId');
-        
-        const facilityMap = {};
+  // 자동완성 로직 (실시간 데이터 연결)
+  let focusedIdx = -1;
+  function initAutocomplete() {
+    const input = document.getElementById('facilitySearch');
+    const dropdown = document.getElementById('acDropdown');
+    const idInput = document.getElementById('facilityId');
 
-        if (typeof SAMPLE_FACILITIES !== 'undefined' && typeof BUILDINGS !== 'undefined') {
-            SAMPLE_FACILITIES.forEach(f => {
-                const b = BUILDINGS[f.buildingCode] || { name: f.buildingCode };
-                const displayName = `[${f.buildingCode} ${b.name}] ${f.name} (ID: ${f.id})`;
-                
-                facilityMap[displayName] = f.id;
-
-                const option = document.createElement('option');
-                option.value = displayName;
-                dataList.appendChild(option);
-            });
-        }
-
-        searchInput.addEventListener('input', (e) => {
-            const selectedValue = e.target.value;
-            if (facilityMap[selectedValue]) {
-                idInput.value = facilityMap[selectedValue];
-            }
-        });
+    // 외부 SAMPLE_FACILITIES와 BUILDINGS를 결합하여 검색 데이터 생성
+    const acData = SAMPLE_FACILITIES.map(f => {
+      const b = BUILDINGS[f.buildingCode] || { name: f.buildingCode, alias: '' };
+      return { id: f.id, code: f.buildingCode, facilityName: f.name, buildingName: b.name, alias: b.alias || '' };
     });
+
+    input.addEventListener('input', () => {
+      const q = input.value.trim().toLowerCase();
+      if (!q) { dropdown.classList.remove('open'); idInput.value = ''; return; }
+      const matches = acData.filter(d => 
+        d.facilityName.includes(q) || d.buildingName.includes(q) || d.code.toLowerCase().includes(q) || d.alias.toLowerCase().includes(q)
+      ).slice(0, 10);
+      
+      dropdown.innerHTML = matches.map((d, i) => 
+        `<div class="ac-item" onclick="selectItem('${d.facilityName}', '${d.id}')">
+          <span class="ac-code">${d.code}</span>
+          <span class="ac-name">${d.facilityName}</span>
+          <span class="ac-building">${d.buildingName}</span>
+        </div>`).join('') || '<div class="ac-empty">결과 없음</div>';
+      dropdown.classList.add('open');
+    });
+
+    window.selectItem = (name, id) => {
+      input.value = name;
+      idInput.value = id;
+      dropdown.classList.remove('open');
+    };
+    
+    input.addEventListener('blur', () => setTimeout(() => dropdown.classList.remove('open'), 200));
+  }
+
+  function previewImg(input) {
+    const preview = document.getElementById('imgPreview');
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    initAutocomplete();
+    document.getElementById('uploadDate').value = new Date().toISOString().split('T')[0];
+  });
 </script>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyDMAs8AuYNwgfwW9-BFqifPR0iV3KqHIAM",
-        authDomain: "dcu-facility-admin.firebaseapp.com",
-        projectId: "dcu-facility-admin",
-        storageBucket: "dcu-facility-admin.firebasestorage.app",
-        messagingSenderId: "828018517371",
-        appId: "1:828018517371:web:783225b803a4272e47c9de"
+  const firebaseConfig = {
+    apiKey: "AIzaSyDMAs8AuYNwgfwW9-BFqifPR0iV3KqHIAM",
+    authDomain: "dcu-facility-admin.firebaseapp.com",
+    projectId: "dcu-facility-admin",
+    storageBucket: "dcu-facility-admin.firebasestorage.app",
+    messagingSenderId: "828018517371",
+    appId: "1:828018517371:web:783225b803a4272e47c9de"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  window.handleLogin = async () => {
+    const email = document.getElementById('adminEmail').value;
+    const pw = document.getElementById('adminPw').value;
+    try { await signInWithEmailAndPassword(auth, email, pw); } 
+    catch (e) { alert("로그인 정보가 올바르지 않습니다."); }
+  };
+
+  window.handleLogout = () => signOut(auth);
+
+  onAuthStateChanged(auth, (user) => {
+    document.getElementById('loginSection').style.display = user ? 'none' : 'block';
+    document.getElementById('uploadSection').style.display = user ? 'block' : 'none';
+    document.getElementById('logoutBtn').style.display = user ? 'block' : 'none';
+  });
+
+  window.handleUpload = async () => {
+    const id = document.getElementById('facilityId').value;
+    const date = document.getElementById('uploadDate').value;
+    const isVerified = document.getElementById('isVerified').checked; // ✅ 검증 여부 체크박스
+    const link = document.getElementById('sourceLink').value;
+    const memo = document.getElementById('memoText').value;
+    const fileInput = document.getElementById('imageFile');
+    const btn = document.getElementById('uploadBtn');
+
+    if (!id || !date || !fileInput.files[0]) { alert("필수 항목(ID, 날짜, 이미지)을 확인해 주세요."); return; }
+
+    btn.disabled = true; btn.innerText = "UPLOADING...";
+
+    const reader = new FileReader();
+    reader.readAsDataURL(fileInput.files[0]);
+    reader.onload = async () => {
+      try {
+        const docRef = doc(db, "photos", id);
+        await setDoc(docRef, {
+          verified: isVerified, // ✅ 실시간 검증 마크 저장
+          updates: arrayUnion({ date, link, memo, image: reader.result })
+        }, { merge: true });
+        alert("성공적으로 저장되었습니다.");
+        location.reload();
+      } catch (e) { alert("저장 실패: " + e.message); btn.disabled = false; btn.innerText = "데이터 저장하기"; }
     };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    window.handleLogin = async () => {
-        const email = document.getElementById('adminEmail').value;
-        const pw = document.getElementById('adminPw').value;
-        try { await signInWithEmailAndPassword(auth, email, pw); } 
-        catch (e) { alert("로그인 실패!"); }
-    };
-
-    window.handleLogout = () => signOut(auth);
-
-    onAuthStateChanged(auth, (user) => {
-        document.getElementById('loginSection').style.display = user ? 'none' : 'block';
-        document.getElementById('uploadSection').style.display = user ? 'block' : 'none';
-        
-        // 오늘 날짜 기본 세팅
-        if(user) {
-            document.getElementById('uploadDate').value = new Date().toISOString().split('T')[0];
-        }
-    });
-
-    window.previewImage = (input) => {
-        const preview = document.getElementById('imgPreview');
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (e) => { preview.src = e.target.result; preview.style.display = 'block'; };
-            reader.readAsDataURL(input.files[0]);
-        }
-    };
-
-    window.handleUpload = async () => {
-        const id = document.getElementById('facilityId').value;
-        const date = document.getElementById('uploadDate').value;
-        const link = document.getElementById('sourceLink').value;
-        const memo = document.getElementById('memoText').value;
-        const fileInput = document.getElementById('imageFile');
-        const btn = document.getElementById('uploadBtn');
-
-        if (!id || !date || !fileInput.files[0]) { alert("필수 항목을 채워주세요."); return; }
-
-        btn.disabled = true;
-        btn.innerText = "저장 중...";
-
-        const reader = new FileReader();
-        reader.readAsDataURL(fileInput.files[0]);
-        reader.onload = async () => {
-            try {
-                const docRef = doc(db, "photos", id);
-                await setDoc(docRef, {
-                    updates: arrayUnion({ date, link, memo, image: reader.result })
-                }, { merge: true });
-                alert("저장 완료!");
-                location.reload();
-            } catch (e) { alert("오류: " + e.message); btn.disabled = false; }
-        };
-    };
+  };
 </script>
 </body>
 </html>
