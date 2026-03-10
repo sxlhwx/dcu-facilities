@@ -12,16 +12,25 @@
 <body>
 
 <div class="topbar">
-  <div class="topbar-title">DCU ADMIN <span id="loadingTag">SYNCING...</span></div>
-  <button id="logoutBtn" onclick="handleLogout()">LOGOUT</button>
+  <div class="topbar-title">
+    DCU <span style="font-weight:400;color:#aaa"> | </span> <span style="font-weight:400">ADMIN</span>
+    <span id="loadingTag">SYNCING...</span>
+  </div>
+  <button id="logoutBtn" onclick="handleLogout()">LOG OUT</button>
 </div>
 
 <div class="admin-wrap">
   <div id="loginSection">
     <div class="card">
       <div class="card-title">Auth Required</div>
-      <input type="email" id="adminEmail" placeholder="Email" style="margin-bottom:10px;">
-      <input type="password" id="adminPw" placeholder="Password" style="margin-bottom:18px;">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="adminEmail" placeholder="관리자 이메일">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="adminPw" placeholder="비밀번호">
+      </div>
       <button class="btn" onclick="handleLogin()">LOG IN</button>
     </div>
   </div>
@@ -36,6 +45,7 @@
           <div class="ac-dropdown" id="acDropdown"></div>
         </div>
       </div>
+      
       <div class="form-group">
         <label>ID / 검증 상태</label>
         <div class="id-verified-row">
@@ -45,12 +55,24 @@
           </label>
         </div>
       </div>
+
       <div class="form-group">
         <label>출처 데이터 (선택)</label>
         <input type="date" id="uploadDate" style="margin-bottom:8px;">
         <input type="url" id="sourceLink" placeholder="출처 URL" style="margin-bottom:8px;">
-        <input type="file" id="imageFile" accept="image/*" style="font-size:11px;">
+        
+        <div id="dropZone" class="drop-zone">
+            <p>사진을 드래그하거나 클릭하여 업로드</p>
+            <input type="file" id="imageFile" accept="image/*" style="display:none;">
+            <img id="imgPreview" class="preview-thumb" onclick="openLightbox(this.src)">
+        </div>
       </div>
+
+      <div class="form-group">
+        <label>메모</label>
+        <textarea id="memoText" placeholder="특이사항을 입력하세요"></textarea>
+      </div>
+
       <button class="btn" id="uploadBtn" onclick="handleUpload()">Update Status</button>
     </div>
 
@@ -71,6 +93,10 @@
       </table>
     </div>
   </div>
+</div>
+
+<div id="lightbox" class="lightbox" onclick="this.style.display='none'">
+    <img id="lightboxImg">
 </div>
 
 <script type="module" src="logic.js"></script>

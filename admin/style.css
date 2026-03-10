@@ -6,50 +6,63 @@
 }
 body { font-family: var(--sans); background: var(--gray-100); color: var(--black); font-size: 14px; }
 
-/* 레이아웃 */
-.topbar { position: sticky; top: 0; z-index: 100; background: var(--white); border-bottom: 1.5px solid var(--black); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 48px; }
-.topbar-title { font-family: var(--mono); font-size: 13px; letter-spacing: 0.12em; font-weight: 700; }
-#loadingTag { color: var(--gray-400); font-weight: 400; font-size: 10px; margin-left: 8px; display: none; }
-#logoutBtn { display: none; font-family: var(--mono); font-size: 10px; border: 1px solid var(--gray-200); background: none; padding: 4px 8px; cursor: pointer; }
+/* 헤더 스타일 */
+.topbar { 
+    position: sticky; top: 0; z-index: 100; background: var(--white); 
+    border-bottom: 1.5px solid var(--black); display: flex; 
+    align-items: center; justify-content: space-between; 
+    padding: 0 24px; height: 48px; 
+}
+.topbar-title { font-family: var(--mono); font-size: 13px; letter-spacing: 0.12em; font-weight: 700; display: flex; align-items: center; }
+#loadingTag { color: var(--gray-400); font-weight: 400; font-size: 10px; margin-left: 12px; display: none; }
+#logoutBtn { display: none; font-family: var(--mono); font-size: 10px; border: 1px solid var(--gray-200); background: none; color: var(--gray-600); padding: 4px 12px; cursor: pointer; }
 
+/* 레이아웃 */
 .admin-wrap { max-width: 540px; margin: 48px auto; padding: 0 16px 80px; }
 .card { background: var(--white); border: 1.5px solid var(--black); padding: 32px; margin-bottom: 24px; }
 .card-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 20px; display: flex; justify-content: space-between; }
 
 /* 폼 요소 */
-.form-group { margin-bottom: 18px; }
+.form-group { margin-bottom: 18px; position: relative; }
 label { display: block; font-size: 11px; font-weight: 500; color: var(--gray-600); margin-bottom: 6px; text-transform: uppercase; }
 input, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--gray-200); background: var(--gray-100); font-family: var(--sans); font-size: 13px; outline: none; }
 input:focus, textarea:focus { border-color: var(--black); background: var(--white); }
+textarea { height: 80px; resize: vertical; }
 
-/* ID & Verified 줄 수정 (삐져나감 방지) */
-.id-verified-row { display: flex; align-items: center; gap: 12px; }
-#facilityId { flex: 0 0 140px; min-width: 0; } /* ID 칸 너비 고정 */
-.verified-label { 
-    margin: 0; 
-    display: flex; 
-    align-items: center; 
-    gap: 6px; 
-    cursor: pointer; 
-    white-space: nowrap; 
-    flex-shrink: 0; /* 공간 부족해도 줄어들지 않음 */
-    font-size: 12px;
+/* 🔍 드롭다운 위치 고정 */
+.autocomplete-wrap { position: relative; width: 100%; }
+.ac-dropdown { 
+    position: absolute; top: 100%; left: 0; right: 0; 
+    background: var(--white); border: 1.5px solid var(--black); 
+    border-top: none; z-index: 1000; max-height: 200px; 
+    overflow-y: auto; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
-#isVerified { width: auto; margin: 0; } /* 체크박스 크기 자동화 */
+.ac-dropdown.open { display: block !important; }
+.ac-item { padding: 12px; cursor: pointer; border-bottom: 1px solid var(--gray-100); font-size: 13px; }
+.ac-item:hover { background: var(--gray-100); }
 
-.btn { width: 100%; padding: 12px; border: 1.5px solid var(--black); background: var(--black); color: var(--white); font-family: var(--mono); font-size: 11px; cursor: pointer; text-transform: uppercase; }
+/* ✅ Verified 튀어나감 방지 레이아웃 */
+.id-verified-row { display: flex; align-items: center; gap: 10px; width: 100%; }
+#facilityId { flex: 1; min-width: 0; } /* ID칸이 유연하게 줄어듦 */
+.verified-label { 
+    flex: 0 0 auto; /* 글자 길이에 딱 맞게 유지하고 절대 줄어들지 않음 */
+    margin: 0; display: flex; align-items: center; gap: 6px; 
+    cursor: pointer; white-space: nowrap; font-size: 12px;
+}
+#isVerified { width: 16px; height: 16px; margin: 0; cursor: pointer; }
+
+/* 📸 드래그앤드랍 & 라이트박스 */
+.drop-zone { border: 2px dashed var(--gray-200); background: var(--gray-100); padding: 24px; text-align: center; color: var(--gray-400); font-size: 12px; cursor: pointer; margin-bottom: 8px; }
+.drop-zone.dragover { border-color: var(--black); background: var(--white); color: var(--black); }
+.preview-thumb { max-width: 100%; max-height: 150px; margin-top: 12px; display: none; border: 1.5px solid var(--black); cursor: zoom-in; }
+.lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 2000; }
+.lightbox img { max-width: 90%; max-height: 90%; border: 2px solid var(--white); }
+
+.btn { width: 100%; padding: 14px; border: 1.5px solid var(--black); background: var(--black); color: var(--white); font-family: var(--mono); font-size: 11px; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
 .btn:hover { background: var(--white); color: var(--black); }
 
-/* 현황판 테이블 */
+/* 📊 현황판 테이블 (삭제 버튼 제거됨) */
 .status-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-.status-table th { text-align: left; font-size: 10px; color: var(--gray-400); padding: 8px 4px; border-bottom: 1px solid var(--black); }
-.status-table td { padding: 10px 4px; border-bottom: 1px solid var(--gray-100); font-size: 12px; }
-.badge-v { color: var(--green); font-weight: bold; }
-.badge-count { font-family: var(--mono); font-size: 11px; background: var(--gray-100); padding: 2px 6px; border-radius: 10px; }
-
-/* 자동완성 */
-.autocomplete-wrap { position: relative; }
-.ac-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: var(--white); border: 1.5px solid var(--black); border-top: none; z-index: 200; max-height: 200px; overflow-y: auto; display: none; }
-.ac-dropdown.open { display: block; }
-.ac-item { padding: 10px; cursor: pointer; border-bottom: 1px solid var(--gray-100); }
-.ac-item:hover { background: var(--gray-100); }
+.status-table th { text-align: left; font-size: 10px; color: var(--gray-400); padding: 8px 4px; border-bottom: 1.5px solid var(--black); }
+.status-table td { padding: 12px 4px; border-bottom: 1px solid var(--gray-100); font-size: 12px; }
+.badge-count { font-family: var(--mono); font-size: 10px; background: var(--gray-100); padding: 2px 6px; border-radius: 10px; }
