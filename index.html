@@ -6,8 +6,20 @@
 <title>DCU 교내 시설 운영시간</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<style>
+  /* Base64 코드가 텍스트로 노출되는 것을 방지 */
+  .info-source-card span, .info-source-card div {
+    word-break: break-all;
+  }
+  /* 파일명 자리에 코드가 뜨면 숨기거나 처리하는 스타일 */
+  #sb-body img[src*="data:image"] {
+    display: block !important;
+    width: 100%;
+    height: auto;
+  }
+</style>
 </head>
-<body onload="init()">
+<body onload="startWithFirebase()">
 
 <div id="top-notice-bar" class="notice-bar" onclick="openNoticeModal()" style="display:none;">
   <span>📢</span><span id="notice-bar-title">공지사항</span>
@@ -33,7 +45,7 @@
 </div>
 
 <div class="subbar">
-  <input id="search-input" type="text" placeholder="시설명 또는 구역(A, B1) 검색" oninput="handleSearch(this.value)" style="border:none;outline:none;font-family:var(--sans);font-size:11px;background:none;flex:1;" />
+  <input id="search-input" type="text" placeholder="시설명 또는 구역 검색" oninput="handleSearch(this.value)" style="border:none;outline:none;font-family:var(--sans);font-size:11px;background:none;flex:1;" />
   
   <select id="mobile-cat-select" onchange="handleMobileCat(this.value)">
     <option value="all">전체</option>
@@ -79,19 +91,81 @@
     <button class="view-toggle-btn" id="btn-desktop" onclick="toggleView('desktop')" style="background:none;border:none;cursor:pointer;font-family:var(--sans);font-size:11px;color:var(--gray-400);">💻 데스크탑</button>
     <span class="view-toggle-sep" style="color:var(--gray-200);font-size:10px;">|</span>
     <button class="view-toggle-btn" id="btn-mobile" onclick="toggleView('mobile')" style="background:none;border:none;cursor:pointer;font-family:var(--sans);font-size:11px;color:var(--gray-400);">📱 모바일</button>
-    
-    <button class="view-toggle-btn-mini" id="btn-mini" onclick="toggleView(currentView === 'desktop' ? 'mobile' : 'desktop')" style="display:none; background:none;border:none;cursor:pointer;font-size:16px;">💻</button>
   </div>
 </div>
 
 <script src="data/notice.js?v=1.13.1"></script>
 <script src="data/building.js?v=1.13.1"></script>
 <script src="data/facility.js?v=1.13.1"></script>
-<script src="data/photo.js?v=1.13.1"></script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDMAs8AuYNwgfwW9-BFqifPR0iV3KqHIAM",
+        authDomain: "dcu-facility-admin.firebaseapp.com",
+        projectId: "dcu-facility-admin",
+        storageBucket: "dcu-facility-admin.firebasestorage.app",
+        messagingSenderId: "828018517371",
+        appId: "1:828018517371:web:783225b803a4272e47c9de"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.PHOTO_UPDATES = {};
+
+    window.startWithFirebase = async () => {
+        try {
+            const querySnapshot = await getDocs(collection(db, "photos"));
+            querySnapshot.forEach((doc) => {
+                const facilityId = doc.id;
+                const data = doc.data();
+                if (data.updates) {
+                    window.PHOTO_UPDATES[facilityId] = data.updates.map(item => ({
+                        file: item.image, // Base64 데이터
+                        date: item.date,
+                        url: item.link || "",
+                        memo: item.memo || ""
+                    }));
+                }
+            });
+        } catch (e) {
+            console.error(e);
+        } finally {
+            if (typeof init === "function") init();
+        }
+    };
+</script>
+
 <script src="js/time.js?v=1.13.1"></script>
 <script src="js/notice-ui.js?v=1.13.1"></script>
 <script src="js/list-ui.js?v=1.13.1"></script>
 <script src="js/sidebar-ui.js?v=1.13.1"></script>
 <script src="js/setup.js?v=1.13.1"></script>
+
+<script>
+  const updateImages = () => {
+    // 1. 사이드바에 나타난 이미지 태그들 수정
+    document.querySelectorAll('#sb-body img').forEach(img => {
+      // 경로에 images/가 붙어버린 Base64 데이터를 구조대기
+      if (img.src.includes('images/data:image')) {
+        img.src = img.src.replace(/.*images\//, '');
+      }
+    });
+
+    // 2. "파일명: data:image..." 라고 적힌 텍스트 숨기기
+    document.querySelectorAll('#sb-body *').forEach(el => {
+      if (el.innerText && el.innerText.includes('파일명: data:image')) {
+        el.style.display = 'none'; // 코드가 텍스트로 뜨는 부분은 아예 숨김
+      }
+    });
+  };
+
+  // 화면이 변할 때마다(사이드바가 열릴 때마다) 실행
+  const observer = new MutationObserver(updateImages);
+  observer.observe(document.body, { childList: true, subtree: true });
+</script>
 </body>
 </html>
