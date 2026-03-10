@@ -7,8 +7,12 @@ function renderSidebarContent(id) {
   let dotC = st.status === 'green' ? 'var(--green)' : 'var(--gray-dot)';
   if (st.rem !== null && st.rem < 60) dotC = 'var(--yellow)';
   const remInfo = st.rem ? `<span style="color:${dotC}; margin-left: 12px;">${formatTimeWithDimming(st.rem)} 뒤 ${st.status === 'green' ? '폐쇄' : '개방'}</span>` : '';
+  
   const targetFile = info ? info.file : `${id}_1.jpg`;
-  const imgPath = `image/${targetFile}`;
+  
+  // Base64 데이터(Firebase)면 그대로 쓰고, 아니면 image/ 폴더 경로를 추가합니다.
+  const imgPath = targetFile.startsWith('data:image') ? targetFile : `image/${targetFile}`;
+
   let dotHtml = photos.length > 1 ? `<div class="sb-dot-container">` + photos.map((_, i) => `<div class="sb-dot ${i === currentSourceIdx ? 'active' : ''}" onclick="goToSource('${id}', ${i})"></div>`).join('') + `</div>` : '';
   const body = document.getElementById('sb-body');
   if (!body) return;
@@ -22,11 +26,11 @@ function renderSidebarContent(id) {
     <div class="sb-section" style="margin-bottom:30px;"><div class="sb-label">Operation Hours</div><div class="sb-content">${renderOpHours(f.schedules)}</div></div>
     <div class="sb-section" style="margin-bottom:30px;"><div class="sb-label">Tag</div><div class="sb-content" style="font-size:14px;">${f.tag || '-'}</div></div>
     <div class="sb-source-section">
-      <div class="sb-source-header"><div class="sb-label" style="margin-bottom:0;">Info Source</div><div style="display:flex; align-items:center;">${info ? `<span class="sb-source-date">Updated: ${info.date}</span>` : ''}${info && info.url ? `<a href="${info.url}" target="_blank" class="sb-source-emoji">🔗</a>` : ''}</div></div>
+      <div class="sb-source-header"><div class="sb-label" style="margin-bottom:0;">Info Source</div><div style="display:flex; align-items:center;">${info && info.date ? `<span class="sb-source-date">Updated: ${info.date}</span>` : ''}${info && info.url ? `<a href="${info.url}" target="_blank" class="sb-source-emoji">🔗</a>` : ''}</div></div>
       <div class="sb-source-wrapper">
         <img src="${imgPath}" class="sb-source-img" onclick="expandImage('${imgPath}')" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
         <div class="sb-no-image-placeholder" style="display:none; font-size:12px; color:var(--gray-400); text-align:center; padding:15px; background:var(--gray-100); border-radius:4px; border:1px dashed var(--gray-200); width:100%;">
-          준비된 이미지 없음<br>파일명: <b style="color:var(--black); font-family:var(--mono);">${targetFile}</b>
+          준비된 이미지 없음
         </div>
         ${dotHtml}
       </div>

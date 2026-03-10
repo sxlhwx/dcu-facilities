@@ -145,27 +145,5 @@
 <script src="js/sidebar-ui.js?v=1.13.1"></script>
 <script src="js/setup.js?v=1.13.1"></script>
 
-<script>
-  const updateImages = () => {
-    // 1. 사이드바에 나타난 이미지 태그들 수정
-    document.querySelectorAll('#sb-body img').forEach(img => {
-      // 경로에 images/가 붙어버린 Base64 데이터를 구조대기
-      if (img.src.includes('images/data:image')) {
-        img.src = img.src.replace(/.*images\//, '');
-      }
-    });
-
-    // 2. "파일명: data:image..." 라고 적힌 텍스트 숨기기
-    document.querySelectorAll('#sb-body *').forEach(el => {
-      if (el.innerText && el.innerText.includes('파일명: data:image')) {
-        el.style.display = 'none'; // 코드가 텍스트로 뜨는 부분은 아예 숨김
-      }
-    });
-  };
-
-  // 화면이 변할 때마다(사이드바가 열릴 때마다) 실행
-  const observer = new MutationObserver(updateImages);
-  observer.observe(document.body, { childList: true, subtree: true });
-</script>
 </body>
 </html>
