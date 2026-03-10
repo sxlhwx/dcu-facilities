@@ -15,7 +15,10 @@
         button:hover { background: #0056b3; }
         #uploadSection { display: none; }
         .preview { max-width: 100%; border-radius: 8px; margin-top: 15px; display: none; border: 1px solid #eee; }
+        .search-highlight { background-color: #e9ecef; border-color: #ced4da; }
     </style>
+    <script src="../data/building.js"></script>
+    <script src="../data/facility.js"></script>
 </head>
 <body>
 <div class="admin-container">
@@ -28,9 +31,16 @@
 
     <div id="uploadSection">
         <h3>시설 정보 업데이트</h3>
+        
         <div class="form-group">
-            <label>시설 고유 ID (예: gym_prog, library_1)</label>
-            <input type="text" id="facilityId" placeholder="고유 ID를 정확히 입력하세요">
+            <label>🔍 시설명/건물명 검색 (자동 완성)</label>
+            <input list="facility-list" id="facilitySearch" class="search-highlight" placeholder="한글 시설명이나 건물명을 입력하세요">
+            <datalist id="facility-list"></datalist>
+        </div>
+
+        <div class="form-group">
+            <label>시설 고유 ID (자동 입력됨)</label>
+            <input type="text" id="facilityId" placeholder="고유 ID (직접 입력도 가능)">
         </div>
         <div class="form-group">
             <label>확인 날짜</label>
@@ -53,6 +63,37 @@
         <button onclick="handleLogout()" style="margin-top:10px; background:#6c757d;">로그아웃</button>
     </div>
 </div>
+
+<script>
+    // 시설 검색 및 자동완성 스크립트
+    window.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('facilitySearch');
+        const dataList = document.getElementById('facility-list');
+        const idInput = document.getElementById('facilityId');
+        
+        const facilityMap = {};
+
+        if (typeof SAMPLE_FACILITIES !== 'undefined' && typeof BUILDINGS !== 'undefined') {
+            SAMPLE_FACILITIES.forEach(f => {
+                const b = BUILDINGS[f.buildingCode] || { name: f.buildingCode };
+                const displayName = `[${f.buildingCode} ${b.name}] ${f.name} (ID: ${f.id})`;
+                
+                facilityMap[displayName] = f.id;
+
+                const option = document.createElement('option');
+                option.value = displayName;
+                dataList.appendChild(option);
+            });
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            const selectedValue = e.target.value;
+            if (facilityMap[selectedValue]) {
+                idInput.value = facilityMap[selectedValue];
+            }
+        });
+    });
+</script>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -84,6 +125,11 @@
     onAuthStateChanged(auth, (user) => {
         document.getElementById('loginSection').style.display = user ? 'none' : 'block';
         document.getElementById('uploadSection').style.display = user ? 'block' : 'none';
+        
+        // 오늘 날짜 기본 세팅
+        if(user) {
+            document.getElementById('uploadDate').value = new Date().toISOString().split('T')[0];
+        }
     });
 
     window.previewImage = (input) => {

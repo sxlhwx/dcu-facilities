@@ -38,12 +38,29 @@ const SAMPLE_FACILITIES = [
   {id:"lib_3f", buildingCode:"A8", category:"학습", name:"예술/어문학실", floor:"3F", schedules:[{period:"학기중",dayType:"평일",open:"09:00",close:"21:00"}]},
   {id:"lib_4f", buildingCode:"A8", category:"학습", name:"인문/사회과학실", floor:"4F", schedules:[{period:"학기중",dayType:"평일",open:"09:00",close:"21:00"}]},
   {id:"lib_5f", buildingCode:"A8", category:"학습", name:"열람실", floor:"5F", schedules:[{period:"학기중",dayType:"평일",open:"07:00",close:"24:00"},{period:"학기중",dayType:"주말",open:"07:00",close:"24:00"}]},
-  {id:"gym_3f", buildingCode:"E1", category:"복지", name:"헬스장", floor:"3F", schedules:[{period:"학기중",dayType:"평일",open:"07:00",close:"21:00"},{period:"방학중",dayType:"평일",open:"09:00",close:"17:00"},{period:"연중",dayType:"공휴일",closed:true}]},
+  {
+    id:"gym_3f", buildingCode:"E1", category:"복지", name:"헬스장", floor:"3F", 
+    schedules:[{period:"학기중",dayType:"평일",open:"07:00",close:"21:00"},{period:"방학중",dayType:"평일",open:"09:00",close:"17:00"},{period:"연중",dayType:"공휴일",closed:true}],
+    exceptions:[
+      {date:"2026-03-13", open:"07:00", close:"16:00"},
+      {date:"2026-03-14", closed:true},
+      {date:"2026-03-15", closed:true}
+    ]
+  },
   {id:"gym_test", buildingCode:"E1", category:"복지", name:"체력측정존", floor:"3F", schedules:[{period:"학기중",dayType:"평일",open:"10:00",close:"20:00"},{period:"방학중",dayType:"평일",open:"10:00",close:"16:00"}]},
   {id:"gym_prog", buildingCode:"E1", category:"복지", name:"프로그램실", floor:"2F", schedules:[{period:"학기중",dayType:"평일",open:"10:00",close:"20:00"},{period:"방학중",dayType:"평일",open:"09:00",close:"17:00"}]},
   {id:"gym_fit", buildingCode:"E1", category:"복지", name:"피팅룸", floor:"3F", schedules:[{period:"학기중",dayType:"평일",open:"07:00",close:"21:00"}]},
-  {id:"gym_shower", buildingCode:"E1", category:"복지", name:"탈의실 및 샤워실", floor:"2F", schedules:[{period:"학기중",dayType:"평일",open:"08:00",close:"21:00"},{period:"방학중",dayType:"평일",open:"10:00",close:"17:00"}]},
-  {id:"gym_locker", buildingCode:"E1", category:"복지", name:"탈의실", floor:"3F", schedules:[{period:"학기중",dayType:"평일",open:"07:00",close:"21:00"}]},
+  {id:"gym_locker_2f", buildingCode:"E1", category:"복지", name:"탈의실(2층)", floor:"2F", schedules:[{period:"학기중",dayType:"평일",open:"08:00",close:"21:00"},{period:"방학중",dayType:"평일",open:"10:00",close:"17:00"}]},
+  {
+    id:"gym_shower_2f", buildingCode:"E1", category:"복지", name:"샤워실", floor:"2F", 
+    schedules:[{period:"학기중",dayType:"평일",open:"08:00",close:"21:00"},{period:"방학중",dayType:"평일",open:"10:00",close:"17:00"}],
+    exceptions:[
+      {date:"2026-03-13", open:"08:00", close:"16:00"},
+      {date:"2026-03-14", closed:true},
+      {date:"2026-03-15", closed:true}
+    ]
+  },
+  {id:"gym_locker_3f", buildingCode:"E1", category:"복지", name:"탈의실(3층)", floor:"3F", schedules:[{period:"학기중",dayType:"평일",open:"07:00",close:"21:00"}]},
   {id:"gym_cons", buildingCode:"E1", category:"복지", name:"운동처방실(304호)", floor:"3F", schedules:[{period:"학기중",dayType:"평일",open:"17:00",close:"20:00"},{period:"방학중",dayType:"평일",open:"09:00",close:"17:00"}]},
   {id:"gym_off", buildingCode:"E1", category:"복지", name:"사무실(310호)", floor:"3F", schedules:[{period:"학기중",dayType:"평일",open:"10:00",close:"16:30"}]}
 ];
