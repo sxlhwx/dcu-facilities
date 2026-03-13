@@ -38,11 +38,27 @@ window.handleLogin = () => signInWithEmailAndPassword(auth, adminEmail.value, ad
 window.handleLogout = () => signOut(auth);
 window.openLightbox = (src) => { lightboxImg.src = src; lightbox.style.display = 'flex'; };
 
-// 파일 핸들링 (드래그앤드랍 로직 추가)
+// 📋 화면 전체 붙여넣기 (Ctrl+V / Cmd+V) 이벤트 감지 추가
+window.addEventListener('paste', (e) => {
+    if (!e.clipboardData || !e.clipboardData.files.length) return;
+    
+    const file = e.clipboardData.files[0];
+    
+    if (file && (file.type.startsWith('image/') || file.name.toLowerCase().endsWith('.heic'))) {
+        e.preventDefault(); 
+        
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        fileInput.files = dt.files;
+        
+        handleFile(file);
+    }
+});
+
+// 파일 핸들링 (드래그앤드랍 + HEIC 지원)
 if(dropZone) {
     dropZone.onclick = () => fileInput.click();
     
-    // 화면 바깥에 실수로 드롭했을 때 파일 열리는 것 방지
     window.addEventListener("dragover", (e) => e.preventDefault(), false);
     window.addEventListener("drop", (e) => e.preventDefault(), false);
 
@@ -58,21 +74,55 @@ if(dropZone) {
         dropZone.classList.remove('dragover');
         
         const file = e.dataTransfer.files[0];
-        if (file && file.type.startsWith('image/')) {
-            fileInput.files = e.dataTransfer.files; // input에 파일 덮어쓰기
-            handleFile(file); // 미리보기 함수 호출
+        if (file && (file.type.startsWith('image/') || file.name.toLowerCase().endsWith('.heic'))) {
+            fileInput.files = e.dataTransfer.files; 
+            handleFile(file); 
         }
     };
 
     fileInput.onchange = (e) => handleFile(e.target.files[0]);
 }
 
-function handleFile(file) {
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (ev) => { preview.src = ev.target.result; preview.style.display = 'block'; };
-        reader.readAsDataURL(file);
+// HEIC 자동 변환 로직이 탑재된 handleFile 함수
+async function handleFile(file) {
+    if (!file) return;
+
+    let processFile = file;
+    const dropText = document.getElementById('dropText');
+
+    if (file.name.toLowerCase().endsWith('.heic') || file.type === 'image/heic') {
+        if(dropText) dropText.innerText = "HEIC 변환 중... (잠시만 기다려주세요)";
+        
+        try {
+            const convertedBlob = await heic2any({
+                blob: file,
+                toType: "image/jpeg",
+                quality: 0.8
+            });
+            
+            processFile = new File([convertedBlob], file.name.replace(/\.heic$/i, ".jpg"), {
+                type: "image/jpeg"
+            });
+            
+            const dt = new DataTransfer();
+            dt.items.add(processFile);
+            fileInput.files = dt.files;
+            
+            if(dropText) dropText.innerText = "사진을 드래그하거나 클릭하여 업로드"; 
+        } catch (e) {
+            alert("HEIC 변환 실패: " + e.message);
+            if(dropText) dropText.innerText = "사진을 드래그하거나 클릭하여 업로드";
+            return;
+        }
     }
+
+    const reader = new FileReader();
+    reader.onload = (ev) => { 
+        preview.src = ev.target.result; 
+        preview.style.display = 'block'; 
+        if(dropText) dropText.style.display = 'none'; 
+    };
+    reader.readAsDataURL(processFile);
 }
 
 // 저장 로직
@@ -114,7 +164,7 @@ window.handleUpload = async () => {
     }
 };
 
-// 현황판 로드 (삭제 버튼 제거)
+// 현황판 로드
 const loadStatusList = async () => {
     loadingTag.style.display = 'inline';
     try {
@@ -122,10 +172,11 @@ const loadStatusList = async () => {
         let html = '';
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            const f = SAMPLE_FACILITIES.find(sf => sf.id === doc.id) || { name: doc.id };
+            const f = SAMPLE_FACILITIES.find(sf => sf.id === doc.id);
+            const name = f ? f.name : doc.id;
             html += `
                 <tr>
-                    <td>${f.name}</td>
+                    <td>${name}</td>
                     <td style="text-align:center;">${data.verified ? '✅' : '-'}</td>
                     <td style="text-align:right;">
                         <span class="badge-count">${data.updates ? data.updates.length : 0}</span>
@@ -147,7 +198,7 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// 검색 로직 (대소문자 무시 + 시설명 기준)
+// 검색 로직
 facilitySearch.addEventListener('input', () => {
     const q = facilitySearch.value.trim().toLowerCase();
     if(!q) { acDropdown.classList.remove('open'); return; }

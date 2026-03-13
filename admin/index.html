@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="style.css">
     <script src="../data/building.js"></script>
     <script src="../data/facility.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 </head>
 <body>
 
@@ -62,7 +63,7 @@
         <input type="url" id="sourceLink" placeholder="출처 URL" style="margin-bottom:8px;">
         
         <div id="dropZone" class="drop-zone">
-            <p>사진을 드래그하거나 클릭하여 업로드</p>
+            <p id="dropText">사진을 드래그하거나 클릭하여 업로드</p>
             <input type="file" id="imageFile" accept="image/*" style="display:none;">
             <img id="imgPreview" class="preview-thumb" onclick="openLightbox(this.src)">
         </div>
