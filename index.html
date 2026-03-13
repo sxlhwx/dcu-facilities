@@ -94,13 +94,13 @@
   </div>
 </div>
 
-<script src="data/notice.js?v=1.13.1"></script>
 <script src="data/building.js?v=1.13.1"></script>
 <script src="data/facility.js?v=1.13.1"></script>
 
 <script type="module">
+    // ✅ getDoc, doc 추가 임포트
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDMAs8AuYNwgfwW9-BFqifPR0iV3KqHIAM",
@@ -115,9 +115,11 @@
     const db = getFirestore(app);
 
     window.PHOTO_UPDATES = {};
+    window.NOTICE_DATA = { active: false }; // 기본값
 
     window.startWithFirebase = async () => {
         try {
+            // 1. 사진/업데이트 정보 불러오기
             const querySnapshot = await getDocs(collection(db, "photos"));
             querySnapshot.forEach((doc) => {
                 const facilityId = doc.id;
@@ -131,6 +133,13 @@
                     }));
                 }
             });
+
+            // 2. ✅ 공지사항(settings/notice) 불러오기 추가
+            const noticeRef = doc(db, "settings", "notice");
+            const noticeSnap = await getDoc(noticeRef);
+            if (noticeSnap.exists()) {
+                window.NOTICE_DATA = noticeSnap.data();
+            }
         } catch (e) {
             console.error(e);
         } finally {
