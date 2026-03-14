@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* 기본 리스트 스타일 */
+        .list-item { height: 60px; border-bottom: 1px solid #eee; display: flex; align-items: center; padding: 0 15px; }
+        
+        /* 스켈레톤 애니메이션 */
+        .skeleton { background: #f2f2f2; border-radius: 4px; }
+        .skeleton-text { width: 60%; height: 15px; }
+        .loading {
+            background: linear-gradient(90deg, #f2f2f2 25%, #e6e6e6 50%, #f2f2f2 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="loader">
+            <div class="list-item"><div class="skeleton skeleton-text loading"></div></div>
+            <div class="list-item"><div class="skeleton skeleton-text loading"></div></div>
+            <div class="list-item"><div class="skeleton skeleton-text loading"></div></div>
+        </div>
+        <ul id="content" style="display: none; list-style: none; padding: 0;"></ul>
+    </div>
+
+    <script>
+        // 데이터 로드 시뮬레이션 (2초 뒤 실행)
+        setTimeout(() => {
+            const content = document.getElementById('content');
+            const loader = document.getElementById('loader');
+            
+            // 데이터 삽입
+            content.innerHTML = `
+                <li class="list-item">중앙도서관 - D-Study Lounge</li>
+                <li class="list-item">기숙사 행정동 - GS25</li>
+                <li class="list-item">취업지원팀 - 블루포트</li>
+            `;
+            
+            loader.style.display = 'none'; // 로더 숨기기
+            content.style.display = 'block'; // 콘텐츠 보이기
+        }, 2000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<head>
+    <style>
+        /* 초기에는 보이지 않음 */
+        #main-container { opacity: 0; transition: opacity 0.5s; }
+        /* 로드가 완료되면 클래스를 추가해 노출 */
+        .ready #main-container { opacity: 1; }
+        
+        /* 로딩 중 보여줄 심플한 텍스트나 스피너 */
+        #page-loader { 
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+        }
+        .ready #page-loader { display: none; }
+    </style>
+</head>
+<body>
+    <div id="page-loader">잠시만 기다려 주세요...</div>
+
+    <div id="main-container">
+        <h1>시설물 현황</h1>
+        <ul><li>데이터 로드 완료!</li></ul>
+    </div>
+
+    <script>
+        window.onload = () => {
+            // 모든 리소스(이미지, 데이터 등)가 준비되면 실행
+            document.body.classList.add('ready');
+        };
+    </script>
+</body>
