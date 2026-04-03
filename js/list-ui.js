@@ -1,10 +1,24 @@
 /**
+ * list-ui.js - 에러 수정 버전
+ */
+
+// 1. 카테고리 설정 (기존에 선언되어 있지 않을 때만 선언)
+if (typeof selectedCats === 'undefined') {
+  window.selectedCats = new Set(['식당', '카페', '매점', '학습', '편의']);
+}
+const DEFAULT_CATS = ['식당', '카페', '매점', '학습', '편의'];
+
+// 2. 페이지 로드 시 초기 실행
+window.addEventListener('DOMContentLoaded', () => {
+  renderViewTable();
+});
+
+/**
  * 검색 처리 함수
  */
 function search(val) {
-  // 모바일에서 검색 시 모든 카테고리를 활성화 (순서 준수)
-  if (currentView === 'mobile' && val.trim().length > 0) {
-    selectedCats = new Set(['식당', '카페', '매점', '학습', '편의']);
+  if (val.trim().length > 0) {
+    selectedCats = new Set(DEFAULT_CATS);
     document.querySelectorAll('.cat-btn').forEach(b => b.classList.add('active'));
     const select = document.getElementById('mobile-cat-select');
     if (select) select.value = 'all';
@@ -13,7 +27,7 @@ function search(val) {
 }
 
 /**
- * 시간 포맷팅 (0을 흐리게 표시)
+ * 시간 포맷팅
  */
 function formatTimeWithDimming(totalMin) {
   const h = Math.floor(totalMin / 60), m = totalMin % 60;
@@ -27,27 +41,42 @@ function formatTimeWithDimming(totalMin) {
  * 메인 리스트 테이블 렌더링
  */
 function renderViewTable() {
-  const now = new Date(), tbody = document.getElementById('view-tbody');
-  const q = document.getElementById('search-input').value.toLowerCase();
+  const now = new Date();
+  const tbody = document.getElementById('view-tbody');
+  const searchInput = document.getElementById('search-input');
+  const q = searchInput ? searchInput.value.toLowerCase() : "";
+  
   if (!tbody) return;
 
-  // 1. 카테고리 필터링 (상수명 FACILITY 사용)
+  // 변수 미선언 에러 방지 (currentView)
+  const viewMode = typeof currentView !== 'undefined' ? currentView : 'desktop';
+
+  // 1. 카테고리 필터링
   let list = FACILITY.filter(f => selectedCats.has(f.category));
   
-  // 2. 검색어 필터링 (시설명 또는 건물코드)
-  if (q) list = list.filter(f => f.name.toLowerCase().includes(q) || f.buildingCode.toLowerCase().includes(q));
+  // 2. 검색어 필터링
+  if (q) {
+    list = list.filter(f => 
+      f.name.toLowerCase().includes(q) || 
+      f.buildingCode.toLowerCase().includes(q)
+    );
+  }
   
-  // 3. 정렬 (운영중인 시설 우선 -> 남은 시간순)
-  list.sort((a,b) => {
-    const stA = TimeManager.getStatus(a, now), stB = TimeManager.getStatus(b, now);
-    if (stA.status === 'green' && stB.status !== 'green') return -1;
-    if (stA.status !== 'green' && stB.status === 'green') return 1;
-    return (stA.rem || 9999) - (stB.rem || 9999);
+  // 3. 정렬
+  list.sort((a, b) => {
+    try {
+      const stA = TimeManager.getStatus(a, now);
+      const stB = TimeManager.getStatus(b, now);
+      if (stA.status === 'green' && stB.status !== 'green') return -1;
+      if (stA.status !== 'green' && stB.status === 'green') return 1;
+      return (stA.rem || 9999) - (stB.rem || 9999);
+    } catch (e) { return 0; }
   });
 
+  // 4. HTML 생성
   tbody.innerHTML = list.map(f => {
     const st = TimeManager.getStatus(f, now);
-    const b = BUILDING[f.buildingCode] || {name:''};
+    const b = BUILDING[f.buildingCode] || {name: ''};
     
     const remV = st.status === 'green' ? formatTimeWithDimming(st.rem) : (st.rem ? (st.rem < 1440 ? formatTimeWithDimming(st.rem) : Math.floor(st.rem/1440)+'일') : '');
     const remL = st.status === 'green' ? ' 뒤 폐쇄' : (st.rem ? ' 뒤 개방' : '운영 종료');
@@ -61,7 +90,7 @@ function renderViewTable() {
       tCell = `<span class="time-cell" style="color:${st.status==='green'?'#aaa':'var(--black)'}">${p[0]}~</span><span class="time-cell" style="color:${st.status==='green'?'var(--black)':'#aaa'}">${p[1]}</span>`;
     }
 
-    const isMob = currentView === 'mobile';
+    const isMob = viewMode === 'mobile';
     const locHtml = isMob ? '' : `<span style="font-family:var(--mono);font-weight:700;font-size:13px">${f.buildingCode}-${f.floor}</span> <span style="color:#aaa;font-size:13px;font-weight:300">${b.name}</span>`;
     
     const nameHtml = isMob 
@@ -74,7 +103,7 @@ function renderViewTable() {
          </div>`
       : `<div class="facility-name-cell"><span class="status-dot ${dotCl}"></span>${f.name}</div>`;
 
-    const trTag = isMob ? `<tr>` : `<tr onclick="openSidebar('${f.id}')">`;
+    const trTag = isMob ? `<tr>` : `<tr onclick="openSidebar('${f.id}')" style="cursor:pointer">`;
 
     return `${trTag}
       <td class="col-loc">${locHtml}</td>
@@ -86,47 +115,29 @@ function renderViewTable() {
   }).join('');
 }
 
-/**
- * 모바일 카테고리 필터 (Select Box)
- */
+// 필터 함수들
 function filterMobile(val) {
-  if (val === 'all') {
-    selectedCats = new Set(['식당', '카페', '매점', '학습', '편의']);
-  } else {
-    selectedCats = new Set([val]);
-  }
-  
-  const allActive = selectedCats.size === 5;
-  document.querySelectorAll('.cat-btn').forEach(b => {
-    const bT = b.textContent;
-    b.classList.toggle('active', allActive || selectedCats.has(bT));
-  });
-  
+  selectedCats = (val === 'all') ? new Set(DEFAULT_CATS) : new Set([val]);
+  updateCatButtons();
   renderViewTable();
 }
 
-/**
- * 카테고리 버튼 필터 (Button Click)
- */
 function filterCategory(cat, btn) {
   if (selectedCats.size === 1 && selectedCats.has(cat)) {
-    // 이미 하나만 선택된 상태에서 다시 누르면 전체 선택으로 복구 (순서 준수)
-    selectedCats = new Set(['식당', '카페', '매점', '학습', '편의']);
+    selectedCats = new Set(DEFAULT_CATS);
   } else {
     selectedCats = new Set([cat]);
   }
-  
-  const allActive = selectedCats.size === 5;
-  
+  updateCatButtons();
+  renderViewTable();
+}
+
+function updateCatButtons() {
+  const allActive = selectedCats.size === DEFAULT_CATS.length;
   document.querySelectorAll('.cat-btn').forEach(b => {
-    const bT = b.textContent;
+    const bT = b.textContent.trim();
     b.classList.toggle('active', allActive || selectedCats.has(bT));
   });
-  
   const select = document.getElementById('mobile-cat-select');
-  if (select) {
-    select.value = allActive ? 'all' : cat;
-  }
-  
-  renderViewTable();
+  if (select) select.value = allActive ? 'all' : Array.from(selectedCats)[0];
 }

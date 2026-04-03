@@ -539,5 +539,46 @@ const FACILITY = [
         "sat": {"type": "영업", "open": "14:00", "close": "16:00", "break": []}, "sun": {"type": "휴무", "open": null, "close": null, "break": []}
       }
     }, "temporary": []
-  }
+  },
+  {
+  "id": "f518",
+  "category": "편의",
+  "name": "시과학센터",
+  "floor": "1F",
+  "buildingCode": "A2",
+  "tag": ["안경원"],
+  "holiday": "unknown",
+  "schedule": {
+    "semester": {
+      "mon": { "type": "영업", "open": "09:00", "close": "17:00", "break": [{ "start": "12:00", "end": "13:00", "note": "점심시간" }] },
+      "tue": { "type": "영업", "open": "09:00", "close": "17:00", "break": [{ "start": "12:00", "end": "13:00", "note": "점심시간" }] },
+      "wed": { "type": "영업", "open": "09:00", "close": "17:00", "break": [{ "start": "12:00", "end": "13:00", "note": "점심시간" }] },
+      "thu": { "type": "영업", "open": "09:00", "close": "17:00", "break": [{ "start": "12:00", "end": "13:00", "note": "점심시간" }] },
+      "fri": { "type": "영업", "open": "09:00", "close": "17:00", "break": [{ "start": "12:00", "end": "13:00", "note": "점심시간" }] },
+      "sat": { "type": "unknown", "open": null, "close": null, "break": [] },
+      "sun": { "type": "unknown", "open": null, "close": null, "break": [] }
+    },
+    "vacation": {
+      "mon": { "type": "unknown", "open": null, "close": null, "break": [] },
+      "tue": { "type": "unknown", "open": null, "close": null, "break": [] },
+      "wed": { "type": "unknown", "open": null, "close": null, "break": [] },
+      "thu": { "type": "unknown", "open": null, "close": null, "break": [] },
+      "fri": { "type": "unknown", "open": null, "close": null, "break": [] },
+      "sat": { "type": "unknown", "open": null, "close": null, "break": [] },
+      "sun": { "type": "unknown", "open": null, "close": null, "break": [] }
+    }
+  },
+  "temporary": [
+    {
+      "date": "2026-04-20",
+      "type": "휴무",
+      "note": "임시휴무"
+    },
+    {
+      "date": "2026-04-21",
+      "type": "휴무",
+      "note": "임시휴무"
+    }
+  ]
+}
 ]
