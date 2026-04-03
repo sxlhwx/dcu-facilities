@@ -19,13 +19,13 @@
   }
 </style>
 </head>
-<body onload="startWithFirebase()">
+<body onload="startApp()">
 
-<div id="top-notice-bar" class="notice-bar" onclick="openNoticeModal()" style="display:none;">
+<div id="top-notice-bar" class="notice-bar" onclick="openNotice()" style="display:none;">
   <span>📢</span><span id="notice-bar-title">공지사항</span>
 </div>
 
-<div id="overlay" onclick="closeSidebar(); closeNoticeModal();"></div>
+<div id="overlay" onclick="closeSidebar(); closeNotice();"></div>
 <div id="img-overlay" onclick="closeImage()">
   <img id="img-expanded">
 </div>
@@ -45,22 +45,22 @@
 </div>
 
 <div class="subbar">
-  <input id="search-input" type="text" placeholder="시설명 또는 구역 검색" oninput="handleSearch(this.value)" style="border:none;outline:none;font-family:var(--sans);font-size:11px;background:none;flex:1;" />
+  <input id="search-input" type="text" placeholder="시설명 또는 구역 검색" oninput="search(this.value)" style="border:none;outline:none;font-family:var(--sans);font-size:11px;background:none;flex:1;" />
   
-  <select id="mobile-cat-select" onchange="handleMobileCat(this.value)">
+  <select id="mobile-cat-select" onchange="filterMobile(this.value)">
     <option value="all">전체</option>
     <option value="식당">식당</option>
-    <option value="편의점">편의점</option>
     <option value="카페">카페</option>
+    <option value="매점">매점</option>
     <option value="학습">학습</option>
-    <option value="복지·문화">복지·문화</option>
+    <option value="편의">편의</option>
   </select>
 
-  <button class="cat-btn active" onclick="toggleCat('식당',this)">식당</button>
-  <button class="cat-btn active" onclick="toggleCat('편의점',this)">편의점</button>
-  <button class="cat-btn active" onclick="toggleCat('카페',this)">카페</button>
-  <button class="cat-btn active" onclick="toggleCat('학습',this)">학습</button>
-  <button class="cat-btn active" onclick="toggleCat('복지·문화',this)">복지·문화</button>
+  <button class="cat-btn active" onclick="filterCategory('식당', this)">식당</button>
+  <button class="cat-btn active" onclick="filterCategory('카페', this)">카페</button>
+  <button class="cat-btn active" onclick="filterCategory('매점', this)">매점</button>
+  <button class="cat-btn active" onclick="filterCategory('학습', this)">학습</button>
+  <button class="cat-btn active" onclick="filterCategory('편의', this)">편의</button>
 </div>
 
 <div class="main-container">
@@ -98,7 +98,6 @@
 <script src="data/facility.js?v=1.13.1"></script>
 
 <script type="module">
-    // ✅ getDoc, doc 추가 임포트
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -115,18 +114,18 @@
     const db = getFirestore(app);
 
     window.PHOTO_UPDATES = {};
-    window.NOTICE_DATA = { active: false }; // 기본값
+    window.NOTICE_DATA = { active: false };
 
-    window.startWithFirebase = async () => {
+    window.startApp = async () => {
         try {
-            // 1. 사진/업데이트 정보 불러오기
+            // 사진 정보 업데이트
             const querySnapshot = await getDocs(collection(db, "photos"));
             querySnapshot.forEach((doc) => {
                 const facilityId = doc.id;
                 const data = doc.data();
                 if (data.updates) {
                     window.PHOTO_UPDATES[facilityId] = data.updates.map(item => ({
-                        file: item.image, // Base64 데이터
+                        file: item.image,
                         date: item.date,
                         url: item.link || "",
                         memo: item.memo || ""
@@ -134,15 +133,16 @@
                 }
             });
 
-            // 2. ✅ 공지사항(settings/notice) 불러오기 추가
+            // 공지사항 정보 로드
             const noticeRef = doc(db, "settings", "notice");
             const noticeSnap = await getDoc(noticeRef);
             if (noticeSnap.exists()) {
                 window.NOTICE_DATA = noticeSnap.data();
             }
         } catch (e) {
-            console.error(e);
+            console.error("데이터 로드 중 에러 발생:", e);
         } finally {
+            // 모든 데이터 로드 후 setup.js의 init 실행
             if (typeof init === "function") init();
         }
     };

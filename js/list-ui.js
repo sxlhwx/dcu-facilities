@@ -1,6 +1,10 @@
-function handleSearch(val) {
+/**
+ * 검색 처리 함수
+ */
+function search(val) {
+  // 모바일에서 검색 시 모든 카테고리를 활성화 (순서 준수)
   if (currentView === 'mobile' && val.trim().length > 0) {
-    selectedCats = new Set(['식당','편의점','카페','학습','복지','문화']);
+    selectedCats = new Set(['식당', '카페', '매점', '학습', '편의']);
     document.querySelectorAll('.cat-btn').forEach(b => b.classList.add('active'));
     const select = document.getElementById('mobile-cat-select');
     if (select) select.value = 'all';
@@ -8,6 +12,9 @@ function handleSearch(val) {
   renderViewTable();
 }
 
+/**
+ * 시간 포맷팅 (0을 흐리게 표시)
+ */
 function formatTimeWithDimming(totalMin) {
   const h = Math.floor(totalMin / 60), m = totalMin % 60;
   const hS = String(h).padStart(2, '0'), mS = String(m).padStart(2, '0');
@@ -16,14 +23,21 @@ function formatTimeWithDimming(totalMin) {
   return `${hH} : ${mH}`;
 }
 
+/**
+ * 메인 리스트 테이블 렌더링
+ */
 function renderViewTable() {
   const now = new Date(), tbody = document.getElementById('view-tbody');
   const q = document.getElementById('search-input').value.toLowerCase();
   if (!tbody) return;
 
-  let list = SAMPLE_FACILITIES.filter(f => selectedCats.has(f.category) || (selectedCats.has('복지') && f.category.includes('복지')));
+  // 1. 카테고리 필터링 (상수명 FACILITY 사용)
+  let list = FACILITY.filter(f => selectedCats.has(f.category));
+  
+  // 2. 검색어 필터링 (시설명 또는 건물코드)
   if (q) list = list.filter(f => f.name.toLowerCase().includes(q) || f.buildingCode.toLowerCase().includes(q));
   
+  // 3. 정렬 (운영중인 시설 우선 -> 남은 시간순)
   list.sort((a,b) => {
     const stA = TimeManager.getStatus(a, now), stB = TimeManager.getStatus(b, now);
     if (stA.status === 'green' && stB.status !== 'green') return -1;
@@ -32,9 +46,12 @@ function renderViewTable() {
   });
 
   tbody.innerHTML = list.map(f => {
-    const st = TimeManager.getStatus(f, now), b = BUILDINGS[f.buildingCode] || {name:''};
+    const st = TimeManager.getStatus(f, now);
+    const b = BUILDING[f.buildingCode] || {name:''};
+    
     const remV = st.status === 'green' ? formatTimeWithDimming(st.rem) : (st.rem ? (st.rem < 1440 ? formatTimeWithDimming(st.rem) : Math.floor(st.rem/1440)+'일') : '');
     const remL = st.status === 'green' ? ' 뒤 폐쇄' : (st.rem ? ' 뒤 개방' : '운영 종료');
+    
     let dotCl = `dot-${st.status}`;
     if (st.rem !== null && st.rem < 60) dotCl = 'dot-yellow';
     
@@ -69,48 +86,46 @@ function renderViewTable() {
   }).join('');
 }
 
-function handleMobileCat(val) {
+/**
+ * 모바일 카테고리 필터 (Select Box)
+ */
+function filterMobile(val) {
   if (val === 'all') {
-    selectedCats = new Set(['식당','편의점','카페','학습','복지','문화']);
-  } else if (val === '복지·문화') {
-    selectedCats = new Set(['복지', '문화']);
+    selectedCats = new Set(['식당', '카페', '매점', '학습', '편의']);
   } else {
     selectedCats = new Set([val]);
   }
   
-  const allActive = selectedCats.size === 6;
+  const allActive = selectedCats.size === 5;
   document.querySelectorAll('.cat-btn').forEach(b => {
     const bT = b.textContent;
-    let act = (bT === '복지·문화') ? (selectedCats.has('복지') || selectedCats.has('문화') || allActive) : (selectedCats.has(bT) || allActive);
-    b.classList.toggle('active', act);
+    b.classList.toggle('active', allActive || selectedCats.has(bT));
   });
   
   renderViewTable();
 }
 
-function toggleCat(cat, btn) {
-  if (cat === '복지·문화') {
-    if (selectedCats.size <= 2 && (selectedCats.has('복지') || selectedCats.has('문화'))) {
-      selectedCats = new Set(['식당','편의점','카페','학습','복지','문화']);
-    } else { selectedCats = new Set(['복지', '문화']); }
+/**
+ * 카테고리 버튼 필터 (Button Click)
+ */
+function filterCategory(cat, btn) {
+  if (selectedCats.size === 1 && selectedCats.has(cat)) {
+    // 이미 하나만 선택된 상태에서 다시 누르면 전체 선택으로 복구 (순서 준수)
+    selectedCats = new Set(['식당', '카페', '매점', '학습', '편의']);
   } else {
-    if (selectedCats.size === 1 && selectedCats.has(cat)) {
-      selectedCats = new Set(['식당','편의점','카페','학습','복지','문화']);
-    } else { selectedCats = new Set([cat]); }
+    selectedCats = new Set([cat]);
   }
   
-  const allActive = selectedCats.size === 6;
+  const allActive = selectedCats.size === 5;
   
   document.querySelectorAll('.cat-btn').forEach(b => {
     const bT = b.textContent;
-    let act = (bT === '복지·문화') ? (selectedCats.has('복지') || selectedCats.has('문화') || allActive) : (selectedCats.has(bT) || allActive);
-    b.classList.toggle('active', act);
+    b.classList.toggle('active', allActive || selectedCats.has(bT));
   });
   
   const select = document.getElementById('mobile-cat-select');
   if (select) {
-    if (allActive) select.value = 'all';
-    else select.value = cat;
+    select.value = allActive ? 'all' : cat;
   }
   
   renderViewTable();
