@@ -27,17 +27,34 @@ function init() {
 }
 
 /**
- * 화면 크기에 따른 뷰 모드 자동 전환
+ * 화면 크기에 따른 대응 (레이아웃 전환 + 버튼 아이콘화)
  */
 function handleResize() {
-  if (isManualToggle) return;
   const w = window.innerWidth;
-  if (w < 750 && currentView === 'desktop') setView('mobile');
-  else if (w >= 750 && currentView === 'mobile') setView('desktop');
+  const btnDesktop = document.getElementById('btn-desktop');
+  const btnMobile = document.getElementById('btn-mobile');
+
+  // [기능 1] 레이아웃 자동 전환 (사용자가 직접 누르지 않았을 때만)
+  if (!isManualToggle) {
+    if (w < 750 && currentView === 'desktop') setView('mobile');
+    else if (w >= 750 && currentView === 'mobile') setView('desktop');
+  }
+
+  // [기능 2] 버튼 아이콘 변환 (수동 모드여도 상관없이 화면 폭에 따라 실행)
+  // 사라지던 지점(450px)에서 글자를 떼고 아이콘만 남깁니다.
+  if (btnDesktop && btnMobile) {
+    if (w < 450) { 
+      btnDesktop.innerHTML = '💻';
+      btnMobile.innerHTML = '📱';
+    } else {
+      btnDesktop.innerHTML = '💻 데스크탑';
+      btnMobile.innerHTML = '📱 모바일';
+    }
+  }
 }
 
 /**
- * 뷰 모드 설정 (데스크탑/모바일)
+ * 뷰 모드 설정
  */
 function setView(mode) {
   currentView = mode;
@@ -49,20 +66,17 @@ function setView(mode) {
   if (btnDesktop) btnDesktop.classList.toggle('active', mode === 'desktop');
   if (btnMobile) btnMobile.classList.toggle('active', mode === 'mobile');
   
-  const btnMini = document.getElementById('btn-mini');
-  if (btnMini) btnMini.textContent = mode === 'desktop' ? '💻' : '📱';
-  
+  // 변경된 뷰에 맞춰 테이블 다시 그리기
   renderViewTable();
 }
 
 /**
- * 사용자가 직접 뷰 모드 전환 버튼을 눌렀을 때
+ * 버튼 클릭 시 호출
  */
 function toggleView(mode) {
-  isManualToggle = true;
+  isManualToggle = true; // 이후 창 크기를 조절해도 레이아웃 자동 전환 방지
   setView(mode);
 }
-
 /**
  * 상단 시계 구동 및 주기적 화면 갱신
  */
