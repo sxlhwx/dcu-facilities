@@ -78,12 +78,17 @@ function renderViewTable() {
     const st = TimeManager.getStatus(f, now);
     const b = BUILDING[f.buildingCode] || {name: ''};
     
-    const remV = st.status === 'green' ? formatTimeWithDimming(st.rem) : (st.rem ? (st.rem < 1440 ? formatTimeWithDimming(st.rem) : Math.floor(st.rem/1440)+'일') : '');
+    // 영업 상태와 무관하게 24시간(1440분) 이상 남았을 경우 'n일'로 표시합니다.
+    let remV = '';
+    if (st.rem !== null) {
+      remV = st.rem >= 1440 ? Math.floor(st.rem / 1440) + '일' : formatTimeWithDimming(st.rem);
+    }
     const remL = st.status === 'green' ? ' 뒤 폐쇄' : (st.rem ? ' 뒤 개방' : '운영 종료');
     
     let dotCl = `dot-${st.status}`;
     if (st.rem !== null && st.rem < 60) dotCl = 'dot-yellow';
     
+    // 기존 색상 유지 로직입니다.
     let tCell = '<span class="time-cell" style="color:#aaa">-</span>';
     if (st.timeStr) {
       const p = st.timeStr.split('~');

@@ -1,5 +1,5 @@
 // 초기 선택 카테고리 설정 (HTML 버튼의 텍스트와 일치시킴)
-let selectedCats = new Set(['식당', '편의점', '카페', '학습', '복지·문화']);
+let selectedCats = new Set(['식당', '카페', '매점', '학습', '편의']);
 let currentSourceIdx = 0;
 let currentView = 'desktop';
 let isManualToggle = false;

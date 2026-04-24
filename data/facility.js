@@ -282,7 +282,16 @@ const FACILITY = [
         "sat": {"type": "영업", "open": "07:00", "close": "24:00", "break": []}, "sun": {"type": "영업", "open": "07:00", "close": "24:00", "break": []}
       },
       "vacation": { "mon": {"type": "unknown", "open": null, "close": null, "break": []}, "tue": {"type": "unknown", "open": null, "close": null, "break": []}, "wed": {"type": "unknown", "open": null, "close": null, "break": []}, "thu": {"type": "unknown", "open": null, "close": null, "break": []}, "fri": {"type": "unknown", "open": null, "close": null, "break": []}, "sat": {"type": "unknown", "open": null, "close": null, "break": []}, "sun": {"type": "unknown", "open": null, "close": null, "break": []} }
-    }, "temporary": []
+    }, "temporary": [
+      {
+      "range": { "start": "2026-04-07", "end": "2026-04-27" },
+      "type": "영업",
+      "open": "00:00",
+      "close": "24:00",
+      "break": [],
+      "note": "시험기간 24시간 연속 개방"
+    }
+    ]
   },
   {
     "id": "f404", "category": "학습", "name": "자연/기술과학실", "floor": "2F", "buildingCode": "A8", "tag": [], "holiday": "unknown",
